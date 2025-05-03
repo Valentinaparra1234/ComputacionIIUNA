@@ -2,29 +2,30 @@
 #include <limits>
 #include <string>
 
-// Constantes
-const std::string MENSAJE_ERROR_ENTRADA = "Error: Por favor ingrese solo numeros enteros.\n";
-const std::string MENSAJE_CONTINUAR = "\nDesea realizar otra operacion? (1: Si / 0: No): ";
+// Constantes para mensajes
+const std::string MENSAJE_ERROR_ENTRADA = "Por favor ingrese solo números enteros.\n";
+const std::string MENSAJE_CONTINUAR = "\n¿Desea realizar otra operación? (1: Sí / 0: No): ";
 
-// Clase Nodo para la lista enlazada
+// Clase que representa un nodo de la lista enlazada
 class NodoLista
 {
 public:
-    int valor;
-    NodoLista *siguiente;
+    int valor;            // Valor almacenado en el nodo
+    NodoLista *siguiente; // Puntero al siguiente nodo
 
-    NodoLista(int valorAlmacenar) : valor(valorAlmacenar), siguiente(nullptr) {}
+    NodoLista(int valorAlmacenar) : valor(valorAlmacenar), siguiente(NULL) {}
 };
 
-// Clase ListaEnlazada
+// Clase que representa una lista enlazada de enteros
 class ListaEnlazada
 {
 private:
-    NodoLista *cabeza;
+    NodoLista *cabeza; // Puntero al primer nodo de la lista
 
+    // Método recursivo para liberar memoria de los nodos
     void liberarMemoria(NodoLista *nodoActual)
     {
-        if (nodoActual != nullptr)
+        if (nodoActual != NULL)
         {
             liberarMemoria(nodoActual->siguiente);
             delete nodoActual;
@@ -32,25 +33,26 @@ private:
     }
 
 public:
-    ListaEnlazada() : cabeza(nullptr) {}
+    ListaEnlazada() : cabeza(NULL) {}
 
     ~ListaEnlazada()
     {
         liberarMemoria(cabeza);
     }
 
+    // Inserta un nuevo nodo al final de la lista
     void insertarElemento(int valorInsertar)
     {
         NodoLista *nuevoNodo = new NodoLista(valorInsertar);
 
-        if (cabeza == nullptr)
+        if (cabeza == NULL)
         {
             cabeza = nuevoNodo;
         }
         else
         {
             NodoLista *nodoActual = cabeza;
-            while (nodoActual->siguiente != nullptr)
+            while (nodoActual->siguiente != NULL)
             {
                 nodoActual = nodoActual->siguiente;
             }
@@ -58,11 +60,12 @@ public:
         }
     }
 
+    // Muestra todos los elementos de la lista con un mensaje
     void mostrarLista(const std::string &mensajeMostrar) const
     {
         std::cout << mensajeMostrar;
         NodoLista *nodoActual = cabeza;
-        while (nodoActual != nullptr)
+        while (nodoActual != NULL)
         {
             std::cout << nodoActual->valor << " ";
             nodoActual = nodoActual->siguiente;
@@ -70,19 +73,22 @@ public:
         std::cout << std::endl;
     }
 
+    // Devuelve el puntero al primer nodo de la lista
     NodoLista *obtenerCabeza() const
     {
         return cabeza;
     }
 };
 
-// Clase OrdenadorRecursivo
+// Clase que implementa un algoritmo de ordenación recursivo tipo selección
+// Nota: Este algoritmo no es el más eficiente, pero es válido con pocos elementos.
 class OrdenadorRecursivo
 {
 public:
+    // Ordena la lista desde el nodo dado usando recursión
     static void ordenarLista(NodoLista *nodoInicio)
     {
-        if (nodoInicio == nullptr || nodoInicio->siguiente == nullptr)
+        if (nodoInicio == NULL || nodoInicio->siguiente == NULL)
         {
             return;
         }
@@ -93,11 +99,12 @@ public:
     }
 
 private:
+    // Encuentra el nodo con el valor mínimo a partir del nodo actual
     static NodoLista *encontrarMinimo(NodoLista *nodoActual)
     {
         NodoLista *nodoMinimo = nodoActual;
 
-        while (nodoActual != nullptr)
+        while (nodoActual != NULL)
         {
             if (nodoActual->valor < nodoMinimo->valor)
             {
@@ -109,6 +116,7 @@ private:
         return nodoMinimo;
     }
 
+    // Intercambia los valores de dos nodos
     static void intercambiarValores(NodoLista *nodoA, NodoLista *nodoB)
     {
         int valorTemporal = nodoA->valor;
@@ -117,9 +125,10 @@ private:
     }
 };
 
-// Módulo de validación de entrada
+// Módulo para validación de entrada del usuario
 namespace ValidacionEntrada
 {
+    // Solicita al usuario un número entero, validando errores
     int obtenerEntero(const std::string &mensaje)
     {
         int valor;
@@ -143,6 +152,7 @@ namespace ValidacionEntrada
         return valor;
     }
 
+    // Pregunta al usuario si desea continuar, validando entrada
     bool deseaContinuar()
     {
         int opcion;
@@ -157,7 +167,7 @@ namespace ValidacionEntrada
             }
             else
             {
-                std::cerr << "Error: Ingrese 1 para Si o 0 para No.\n";
+                std::cerr << "Error: Ingrese 1 para Sí o 0 para No.\n";
             }
         }
 
@@ -165,13 +175,14 @@ namespace ValidacionEntrada
     }
 }
 
-// Módulo de interacción con el usuario
+// Módulo que gestiona la interacción con el usuario
 namespace InterfazUsuario
 {
+    // Solicita al usuario los elementos de la lista
     void solicitarElementosLista(ListaEnlazada &lista)
     {
         int cantidadElementos = ValidacionEntrada::obtenerEntero(
-            "Ingrese la cantidad de elementos a ordenar: ");
+            "Por favor, indique cuántos elementos desea ordenar: ");
 
         std::cout << "Ingrese los elementos (uno por uno):\n";
         for (int indice = 0; indice < cantidadElementos; ++indice)
@@ -182,6 +193,7 @@ namespace InterfazUsuario
         }
     }
 
+    // Ejecuta el proceso completo de ordenamiento
     void ejecutarProcesoOrdenamiento()
     {
         ListaEnlazada lista;
@@ -194,7 +206,7 @@ namespace InterfazUsuario
     }
 }
 
-// Función principal
+// Función principal del programa
 int main()
 {
     std::cout << "=== ORDENADOR DE LISTAS ===" << std::endl;
@@ -204,6 +216,6 @@ int main()
         InterfazUsuario::ejecutarProcesoOrdenamiento();
     } while (ValidacionEntrada::deseaContinuar());
 
-    std::cout << "Programa finalizado. Gracias por usar nuestro servicio!\n";
+    std::cout << "Programa finalizado. ¡Gracias por usar nuestro servicio!\n";
     return 0;
 }

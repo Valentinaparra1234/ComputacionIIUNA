@@ -1,102 +1,138 @@
 #include <iostream>
-#include <climits>
+#include <climits> // Para usar INT_MAX
 using namespace std;
 
-// ---------------------- CLASES BASE ----------------------
+// ---------------------- CLASE NODO ----------------------
+// Representa un nodo individual con un ID y un puntero al siguiente (para listas o colas)
 class Nodo
 {
-public:
+private:
     int id;
     Nodo *siguiente;
-    Nodo(int id) : id(id), siguiente(nullptr) {}
+
+public:
+    // Constructor
+    Nodo(int id) : id(id), siguiente(NULL) {}
+
+    // Getter del ID
+    int getId() const { return id; }
+
+    // Getter del puntero siguiente
+    Nodo *getSiguiente() const { return siguiente; }
+
+    // Setter del puntero siguiente
+    void setSiguiente(Nodo *sig) { siguiente = sig; }
 };
 
+// ---------------------- CLASE LISTA ENLAZADA ----------------------
+// Lista enlazada simple para almacenar adyacencias en el grafo
 class ListaEnlazada
 {
-public:
-    Nodo *cabeza;
-    ListaEnlazada() : cabeza(nullptr) {}
+private:
+    Nodo *cabeza; // Primer nodo de la lista
 
+public:
+    // Constructor
+    ListaEnlazada() : cabeza(NULL) {}
+
+    // Inserta un nuevo nodo al final de la lista
     void insertar(int id)
     {
         Nodo *nuevoNodo = new Nodo(id);
-        if (!cabeza)
+        if (cabeza == NULL)
         {
             cabeza = nuevoNodo;
         }
         else
         {
             Nodo *temp = cabeza;
-            while (temp->siguiente)
+            while (temp->getSiguiente())
             {
-                temp = temp->siguiente;
+                temp = temp->getSiguiente();
             }
-            temp->siguiente = nuevoNodo;
+            temp->setSiguiente(nuevoNodo);
         }
+    }
+
+    // Devuelve el puntero al primer nodo
+    Nodo *getCabeza() const
+    {
+        return cabeza;
     }
 };
 
+// ---------------------- CLASE COLA ----------------------
+// Implementación de una cola FIFO usando nodos
 class Cola
 {
-public:
-    Nodo *frente;
-    Nodo *final;
-    Cola() : frente(nullptr), final(nullptr) {}
+private:
+    Nodo *frente; // Inicio de la cola
+    Nodo *final;  // Final de la cola
 
+public:
+    Cola() : frente(NULL), final(NULL) {}
+
+    // Agrega un elemento al final de la cola
     void encolar(int id)
     {
         Nodo *nuevoNodo = new Nodo(id);
-        if (!frente)
+        if (frente == NULL)
         {
             frente = final = nuevoNodo;
         }
         else
         {
-            final->siguiente = nuevoNodo;
+            final->setSiguiente(nuevoNodo);
             final = nuevoNodo;
         }
     }
 
+    // Remueve y devuelve el elemento del frente
     int desencolar()
     {
-        if (!frente)
+        if (frente == NULL)
             return -1;
-        int id = frente->id;
+        int id = frente->getId();
         Nodo *temp = frente;
-        frente = frente->siguiente;
+        frente = frente->getSiguiente();
         delete temp;
         return id;
     }
 
+    // Verifica si la cola está vacía
     bool vacia()
     {
-        return frente == nullptr;
+        return frente == NULL;
     }
 };
 
-// ---------------------- GRAFO ----------------------
+// ---------------------- CLASE GRAFO ----------------------
+// Clase principal que representa un grafo no dirigido y ponderado
 class Grafo
 {
 private:
-    int numNodos;
-    ListaEnlazada *adyacencias;
-    int **matrizCostes;
+    int numNodos;               // Número total de nodos
+    ListaEnlazada *adyacencias; // Lista de adyacencias para cada nodo
+    int **matrizCostes;         // Matriz de pesos (costes) entre nodos
 
+    // Función recursiva auxiliar para el recorrido DFS
     void _dfsRecursivo(int nodo, bool visitados[])
     {
         visitados[nodo] = true;
-        Nodo *temp = adyacencias[nodo].cabeza;
+        cout << nodo << " ";
+        Nodo *temp = adyacencias[nodo].getCabeza();
         while (temp)
         {
-            if (!visitados[temp->id])
+            if (!visitados[temp->getId()])
             {
-                _dfsRecursivo(temp->id, visitados);
+                _dfsRecursivo(temp->getId(), visitados);
             }
-            temp = temp->siguiente;
+            temp = temp->getSiguiente();
         }
     }
 
 public:
+    // Constructor: inicializa matrices y listas
     Grafo(int numNodos) : numNodos(numNodos)
     {
         adyacencias = new ListaEnlazada[numNodos];
@@ -106,21 +142,24 @@ public:
             matrizCostes[i] = new int[numNodos];
             for (int j = 0; j < numNodos; j++)
             {
-                matrizCostes[i][j] = (i == j) ? 0 : INT_MAX;
+                matrizCostes[i][j] = (i == j) ? 0 : INT_MAX; // 0 en diagonal, infinito en el resto
             }
         }
     }
 
+    // Agrega una arista entre dos nodos con un coste
     void agregarArista(int origen, int destino, int coste)
     {
         adyacencias[origen].insertar(destino);
-        adyacencias[destino].insertar(origen);
+        adyacencias[destino].insertar(origen); // grafo no dirigido
         matrizCostes[origen][destino] = coste;
         matrizCostes[destino][origen] = coste;
     }
 
+    // Algoritmo de Floyd-Warshall para encontrar rutas más cortas entre todos los pares de nodos
     void floydWarshall(int **distancias, int **rutas)
     {
+        // Inicializa distancias y rutas
         for (int i = 0; i < numNodos; i++)
         {
             for (int j = 0; j < numNodos; j++)
@@ -130,6 +169,7 @@ public:
             }
         }
 
+        // Triple bucle para considerar todos los nodos intermedios
         for (int k = 0; k < numNodos; k++)
         {
             for (int i = 0; i < numNodos; i++)
@@ -147,6 +187,25 @@ public:
         }
     }
 
+    // Imprime la ruta completa desde un nodo origen hasta un destino usando la matriz de rutas
+    void imprimirRuta(int origen, int destino, int **rutas)
+    {
+        if (origen == destino)
+        {
+            cout << origen;
+        }
+        else if (rutas[origen][destino] == -1)
+        {
+            cout << "No hay ruta";
+        }
+        else
+        {
+            imprimirRuta(origen, rutas[origen][destino], rutas);
+            cout << " -> " << destino;
+        }
+    }
+
+    // Recorrido BFS desde un nodo de inicio
     void bfs(int inicio)
     {
         bool *visitados = new bool[numNodos]{false};
@@ -160,21 +219,22 @@ public:
             int nodo = cola.desencolar();
             cout << nodo << " ";
 
-            Nodo *temp = adyacencias[nodo].cabeza;
+            Nodo *temp = adyacencias[nodo].getCabeza();
             while (temp)
             {
-                if (!visitados[temp->id])
+                if (!visitados[temp->getId()])
                 {
-                    visitados[temp->id] = true;
-                    cola.encolar(temp->id);
+                    visitados[temp->getId()] = true;
+                    cola.encolar(temp->getId());
                 }
-                temp = temp->siguiente;
+                temp = temp->getSiguiente();
             }
         }
         cout << endl;
         delete[] visitados;
     }
 
+    // Recorrido DFS desde un nodo de inicio
     void dfs(int inicio)
     {
         bool *visitados = new bool[numNodos]{false};
@@ -183,22 +243,33 @@ public:
         cout << endl;
         delete[] visitados;
     }
+
+    // Destructor: libera memoria
+    ~Grafo()
+    {
+        for (int i = 0; i < numNodos; i++)
+        {
+            delete[] matrizCostes[i];
+        }
+        delete[] matrizCostes;
+        delete[] adyacencias;
+    }
 };
 
-// ---------------------- MAIN ----------------------
+// ---------------------- FUNCIÓN PRINCIPAL ----------------------
 int main()
 {
-    const int numNodos = 4; // S=0, 1=1, 2=2, 3=3
+    const int numNodos = 4; // Nodos: S=0, 1=1, 2=2, 3=3
     Grafo grafo(numNodos);
 
-    // Configurar grafo según la Figura 1
+    // Agregar aristas con sus respectivos costes
     grafo.agregarArista(0, 1, 9); // S-1
     grafo.agregarArista(0, 2, 7); // S-2
     grafo.agregarArista(1, 2, 2); // 1-2
     grafo.agregarArista(1, 3, 5); // 1-3
     grafo.agregarArista(2, 3, 2); // 2-3
 
-    // Floyd-Warshall
+    // Reservar memoria para matrices de distancias y rutas
     int **distancias = new int *[numNodos];
     int **rutas = new int *[numNodos];
     for (int i = 0; i < numNodos; i++)
@@ -206,9 +277,11 @@ int main()
         distancias[i] = new int[numNodos];
         rutas[i] = new int[numNodos];
     }
+
+    // Ejecutar Floyd-Warshall
     grafo.floydWarshall(distancias, rutas);
 
-    // Calcular número de saltos (enlaces) en cada ruta desde S (0)
+    // Calcular número de saltos desde S a cada nodo
     int saltos[numNodos] = {0};
     for (int j = 1; j < numNodos; j++)
     {
@@ -218,17 +291,20 @@ int main()
             saltos[j]++;
             nodo = rutas[0][nodo];
         }
-        saltos[j]++; // Contar el último salto (S -> ...)
+        saltos[j]++;
     }
 
-    // Imprimir rutas óptimas y saltos
+    // Mostrar rutas desde nodo 0 a todos los demás
     cout << "Rutas óptimas desde S (0):\n";
     for (int j = 1; j < numNodos; j++)
     {
-        cout << "0 -> " << j << ": Coste = " << distancias[0][j] << ", Saltos = " << saltos[j] << endl;
+        cout << "0 -> " << j << ": Coste = " << distancias[0][j]
+             << ", Saltos = " << saltos[j] << ", Ruta: ";
+        grafo.imprimirRuta(0, j, rutas);
+        cout << endl;
     }
 
-    // Calcular el MÁXIMO número de enlaces (resultado = 2)
+    // Determinar y mostrar el máximo número de enlaces
     int maxSaltos = 0;
     for (int j = 1; j < numNodos; j++)
     {
