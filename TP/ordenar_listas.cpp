@@ -3,8 +3,8 @@
 #include <string>
 
 // Constantes para mensajes
-const std::string MENSAJE_ERROR_ENTRADA = "Por favor ingrese solo números enteros.\n";
-const std::string MENSAJE_CONTINUAR = "\n¿Desea realizar otra operación? (1: Sí / 0: No): ";
+const std::string MENSAJE_ERROR_ENTRADA = "Por favor ingrese solo numeros enteros.\n";
+const std::string MENSAJE_CONTINUAR = "\n¿Desea realizar otra operacion? (1: Si / 0: No): ";
 
 // Clase que representa un nodo de la lista enlazada
 class NodoLista
@@ -182,7 +182,7 @@ namespace InterfazUsuario
     void solicitarElementosLista(ListaEnlazada &lista)
     {
         int cantidadElementos = ValidacionEntrada::obtenerEntero(
-            "Por favor, indique cuántos elementos desea ordenar: ");
+            "Por favor, indique cuantos elementos desea ordenar: ");
 
         std::cout << "Ingrese los elementos (uno por uno):\n";
         for (int indice = 0; indice < cantidadElementos; ++indice)

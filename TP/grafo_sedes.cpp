@@ -111,7 +111,7 @@ public:
 class Grafo
 {
 private:
-    int numNodos;               // Número total de nodos
+    int numNodos;               // Numero total de nodos
     ListaEnlazada *adyacencias; // Lista de adyacencias para cada nodo
     int **matrizCostes;         // Matriz de pesos (costes) entre nodos
 
@@ -156,7 +156,7 @@ public:
         matrizCostes[destino][origen] = coste;
     }
 
-    // Algoritmo de Floyd-Warshall para encontrar rutas más cortas entre todos los pares de nodos
+    // Algoritmo de Floyd-Warshall para encontrar rutas mas cortas entre todos los pares de nodos
     void floydWarshall(int **distancias, int **rutas)
     {
         // Inicializa distancias y rutas
@@ -281,7 +281,7 @@ int main()
     // Ejecutar Floyd-Warshall
     grafo.floydWarshall(distancias, rutas);
 
-    // Calcular número de saltos desde S a cada nodo
+    // Calcular Numero de saltos desde S a cada nodo
     int saltos[numNodos] = {0};
     for (int j = 1; j < numNodos; j++)
     {
@@ -294,8 +294,8 @@ int main()
         saltos[j]++;
     }
 
-    // Mostrar rutas desde nodo 0 a todos los demás
-    cout << "Rutas óptimas desde S (0):\n";
+    // Mostrar rutas desde nodo 0 a todos los demas
+    cout << "Rutas optimas desde S (0):\n";
     for (int j = 1; j < numNodos; j++)
     {
         cout << "0 -> " << j << ": Coste = " << distancias[0][j]
@@ -304,14 +304,14 @@ int main()
         cout << endl;
     }
 
-    // Determinar y mostrar el máximo número de enlaces
+    // Determinar y mostrar el maximo Numero de enlaces
     int maxSaltos = 0;
     for (int j = 1; j < numNodos; j++)
     {
         if (saltos[j] > maxSaltos)
             maxSaltos = saltos[j];
     }
-    cout << "\nNúmero máximo de enlaces (respuesta final): " << maxSaltos << endl;
+    cout << "\nNumero maximo de enlaces (respuesta final): " << maxSaltos << endl;
 
     // Liberar memoria
     for (int i = 0; i < numNodos; i++)

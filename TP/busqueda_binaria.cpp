@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <limits>
+#include <string>
 #include <cmath>
 #include <cctype>
 
